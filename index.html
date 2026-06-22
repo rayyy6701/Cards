@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cyber Neo Card Game Prototype</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Font Awesome (アイコン用) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap');
@@ -47,7 +49,7 @@
             overflow: hidden;
         }
 
-        /* カード裏面（ミステリアスな幾何学・グラデーション） */
+        /* カード裏面 */
         .card-back {
             background: linear-gradient(135deg, #2e1065 0%, #0f172a 100%);
             border: 2px solid #8b5cf6;
@@ -76,7 +78,7 @@
             box-shadow: 0 10px 25px rgba(6, 182, 212, 0.3);
         }
 
-        /* ドロー時のアニメーション（初期状態は非表示、JSでクラス付与） */
+        /* ドロー時のアニメーション */
         @keyframes drawAnim {
             0% {
                 opacity: 0;
@@ -112,6 +114,7 @@
 </head>
 <body class="min-h-screen text-slate-100 flex flex-col justify-between p-4 md:p-8 select-none">
 
+    <!-- ヘッダー -->
     <header class="text-center my-4">
         <h1 class="text-4xl md:text-5xl font-bold uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-500 via-purple-400 to-cyan-400 neon-text">
             NEO CRYPT
@@ -119,8 +122,10 @@
         <p class="text-xs text-cyan-400 tracking-wider mt-2 opacity-80">CARD GAME PROTOTYPE</p>
     </header>
 
+    <!-- メインゲームエリア -->
     <main class="w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 items-center my-auto">
         
+        <!-- 左側：山札（デッキ）エリア -->
         <div class="flex flex-col items-center justify-center p-6 bg-slate-900/40 backdrop-blur-md rounded-2xl border border-purple-500/30 neon-glow h-80">
             <h3 class="text-sm font-semibold tracking-wider text-purple-400 mb-4 uppercase">Deck (山札)</h3>
             
@@ -143,6 +148,7 @@
             </div>
         </div>
 
+        <!-- 右側：場 / 手札エリア -->
         <div class="md:col-span-2 flex flex-col p-6 bg-slate-900/40 backdrop-blur-md rounded-2xl border border-cyan-500/30 neon-glow h-auto md:h-80 justify-between">
             <div class="flex justify-between items-center mb-4 border-b border-cyan-500/20 pb-2">
                 <h3 class="text-sm font-semibold tracking-wider text-cyan-400 uppercase">Field (場 / 手札)</h3>
@@ -150,11 +156,13 @@
             </div>
 
             <div id="field-area" class="flex flex-wrap justify-center gap-6 items-center min-h-[16rem]">
-                </div>
+                <!-- ここに動的にカードが追加されます -->
+            </div>
         </div>
 
     </main>
 
+    <!-- 下部：コントロールパネル -->
     <footer class="w-full max-w-md mx-auto my-6">
         <div class="grid grid-cols-3 gap-4 bg-slate-900/80 p-3 rounded-xl border border-slate-700/50 backdrop-blur-md">
             
@@ -176,20 +184,19 @@
         </div>
     </footer>
 
+    <!-- JavaScriptロジック -->
     <script>
-        // 初期カードデータ（Imgur直接リンクURL）
+        // 指定された新しいカード画像URLに変更
         const INITIAL_CARDS = [
-            "https://i.imgur.com/WrB3W2j.jpeg",
-            "https://i.imgur.com/LQzb0nv.jpeg",
-            "https://i.imgur.com/Jbuffsw.jpeg"
+            "https://i.postimg.cc/KjHjhFXr/Screenshot-2026-06-12-04-51-39-055-com-mi-Ho-Yo-Genshin-Impact.jpg",
+            "https://i.postimg.cc/Xqzq63Ms/Screenshot-2026-06-18-20-04-42-649-com-bluepoch-m-jp-reverse1999-and.jpg",
+            "https://i.postimg.cc/5yRyW1cp/Screenshot-2026-06-18-20-05-06-176-com-bluepoch-m-jp-reverse1999-and.jpg"
         ];
 
-        // ゲーム状態の管理
         let deck = [...INITIAL_CARDS];
         let field = [];
         let isShuffling = false;
 
-        // DOM要素の取得
         const deckTop = document.getElementById('deck-top');
         const deckStack = document.getElementById('deck-stack');
         const deckShadow1 = document.getElementById('deck-shadow-1');
@@ -203,12 +210,9 @@
         const btnDraw = document.getElementById('btn-draw');
         const btnReset = document.getElementById('btn-reset');
 
-        // UIの初期化・更新関数
         function updateUI() {
-            // デッキ枚数の更新
             deckCount.textContent = deck.length;
 
-            // 枚数に応じた山札の厚み（シャドウ）表現
             if (deck.length === 3) {
                 deckTop.classList.remove('hidden');
                 deckShadow1.classList.remove('hidden');
@@ -228,7 +232,6 @@
                 deckEmpty.classList.add('hidden');
                 btnDraw.disabled = false;
             } else {
-                // 山札が0枚の時
                 deckTop.classList.add('hidden');
                 deckShadow1.classList.add('hidden');
                 deckShadow2.classList.add('hidden');
@@ -238,7 +241,6 @@
             }
         }
 
-        // フィッシャー–イェーツのシャッフルアルゴリズム
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -246,7 +248,6 @@
             }
         }
 
-        // --- イベント：シャッフル ---
         btnShuffle.addEventListener('click', () => {
             if (deck.length <= 1 || isShuffling) return;
 
@@ -255,7 +256,6 @@
             btnDraw.disabled = true;
             fieldStatus.textContent = "システムシャッフル中...";
 
-            // 山札にアニメーションクラスを追加
             deckStack.classList.add('animate-shuffle');
 
             setTimeout(() => {
@@ -265,24 +265,20 @@
                 btnShuffle.disabled = false;
                 updateUI();
                 fieldStatus.textContent = "デッキがシャッフルされました";
-            }, 1200); // 1.2秒間ブレンド演出
+            }, 1200);
         });
 
-        // --- イベント：カードを引く (Draw) ---
         btnDraw.addEventListener('click', () => {
             if (deck.length === 0 || isShuffling) return;
 
-            // デッキの先頭（一番上）から1枚取り出す
             const cardUrl = deck.shift();
             field.push(cardUrl);
 
             fieldStatus.textContent = "カードを展開中...";
 
-            // 1. カードオブジェクトの生成（3D構造をHTML化）
             const cardId = `card-${Date.now()}`;
             const cardEl = document.createElement('div');
             cardEl.id = cardId;
-            // hover-triggerでホバー時に裏返る（180度）
             cardEl.className = "card-container w-40 h-56 relative animate-draw hover-trigger cursor-pointer";
             
             cardEl.innerHTML = `
@@ -296,22 +292,18 @@
                 </div>
             `;
 
-            // フィールドエリアへ追加
             fieldArea.appendChild(cardEl);
             updateUI();
 
-            // 2. ドローして場に着地した直後に自動で3Dフリップ（裏→表）させる
             setTimeout(() => {
                 const inner = cardEl.querySelector('.card-inner');
                 if (inner) {
-                    // Y軸を180度回転させて表面にする
                     inner.style.transform = 'rotateY(180deg)';
                 }
                 fieldStatus.textContent = `カードを引きました (残り: ${deck.length}枚)`;
-            }, 400); // 描画直後にフリップを開始
+            }, 400);
         });
 
-        // --- イベント：リセット ---
         btnReset.addEventListener('click', () => {
             deck = [...INITIAL_CARDS];
             field = [];
@@ -320,8 +312,8 @@
             updateUI();
         });
 
-        // 起動時に初回UI同期
         updateUI();
     </script>
 </body>
 </html>
+
